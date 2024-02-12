@@ -17,8 +17,12 @@ const TaskResolver = {
         description,
         projectId,
         employeeId,
-      }: { title: string; description: string; projectId: number; employeeId: number }
+      }: { title: string; description: string; projectId: string; employeeId: string }
     ) => {
+      console.log( title,
+        description,
+        projectId,
+        employeeId,);
       return await Task.create(    {
         title,
         description,

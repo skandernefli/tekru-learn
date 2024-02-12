@@ -35,7 +35,8 @@ class Task extends Model{
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
-    unique:false
+    unique:false,
+    onDelete: 'CASCADE',
 
   })
   declare employeeId: number; 
@@ -47,7 +48,9 @@ class Task extends Model{
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: true,
-    unique:false
+    unique:false,
+    onDelete: 'CASCADE',
+
 
   })
   declare projectId: number; 

@@ -74,6 +74,7 @@ const ProjectResolver = {
         id: any;
       }
     ) => {
+      console.log(id)
       const theProject = await Project.findByPk(id);
       if (theProject) {
         await theProject.destroy();

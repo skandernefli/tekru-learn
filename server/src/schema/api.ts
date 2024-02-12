@@ -21,8 +21,8 @@ const typeDefs = gql`
     id: ID!
     title: String!
     description: String!
-    projectId: Int
-    employeeId: Int
+    projectId: String!
+    employeeId: String!
   }
   type Query {
     getEmployee(id: ID!): employee
@@ -55,8 +55,8 @@ const typeDefs = gql`
       id: ID
       title: String!
       description: String!
-      projectId: Int!
-      employeeId: Int!
+      projectId: String!
+      employeeId: String!
     ): task
 
     updateTask(

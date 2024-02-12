@@ -12,12 +12,6 @@ import ProjectResolver from './resolvers/project';
 import EmployeeResolver from './resolvers/employee';
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
-const allowedOrigins=['*'];
-const options: cors.CorsOptions={
-origin:allowedOrigins,
-
-}
-
 
 
 const app = express();
@@ -45,7 +39,7 @@ start().then(()=>{
   app.use(bodyParser.json()); 
   app.use(
   '/graphql', 
-  cors(options),
+  cors<cors.CorsRequest>({ origin: ['http://localhost:3000'] }),
   expressMiddleware(server),
 
 );

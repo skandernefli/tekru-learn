@@ -54,6 +54,8 @@ const EmployeeResolver = {
        
       }
     )  => {
+      console.log(id)
+
       const theEmployee = await Employee.findByPk(id);
       if (theEmployee) {
         await theEmployee.destroy();
