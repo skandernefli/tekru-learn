@@ -1,5 +1,5 @@
-'use client'
-import { useRouter } from 'next/navigation'
+"use client";
+import { useRouter } from "next/navigation";
 
 import "@mantine/core/styles.css";
 import { useState } from "react";
@@ -14,21 +14,20 @@ const data = [
   { link: "/employees", label: "Employees", icon: IconUsers },
   { link: "/projects", label: "Projects", icon: IconFilePencil },
   { link: "/tasks", label: "Tasks", icon: IconList },
-
 ];
 
 export default function SideBar() {
-  const router = useRouter()
+  const router = useRouter();
 
   const [active, setActive] = useState("Employees");
 
   const links = data.map((item) => (
     <a
-      key={item.label} 
+      key={item.label}
       className={classes.link}
       data-active={item.label === active || undefined}
       onClick={(event) => {
-        router.push(item.link)
+        router.push(item.link);
         event.preventDefault();
         setActive(item.label);
       }}

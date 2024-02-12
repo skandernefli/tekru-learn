@@ -2,10 +2,9 @@
 import { TextInput, Select, Button, Group, Box, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
-import getEmployees from "../../../queries/getEmployees";
-import getProjects from "../../../queries/getProjects";
+import getEmployees from "../../queries/getEmployees";
+import createTask from "../../mutations/createTask"
 import { useQuery, useMutation } from "@apollo/client";
-import updateTask from '../../../mutations/updateTask';
 
 function Form({id}:{id:any}) {
   const [value, setValue] = useState<Date | null>(null);
@@ -14,20 +13,16 @@ function Form({id}:{id:any}) {
     error: EmployeeErno,
     data: queryEmployees,
   } = useQuery(getEmployees);
-  const {
-    loading: LoadingProjects,
-    error: ProjectsErno,
-    data: queryProjects,
-  } = useQuery(getProjects);
+  
 
-  const [UpdateTask, { data, loading, error }] = useMutation(updateTask);
-  const handleSubmit = async (values:any) => {
-    try {
-      await UpdateTask({ variables:  { updateTaskId:id, ...values} });
-    } catch (error) {
-      console.error("err", error);
-    }
-  };
+    const [CreateTask, { data, loading, error }] = useMutation(createTask);
+    const handleSubmit = async (values:any) => {
+      try {
+        await CreateTask({ variables:  { projectId:id, ...values} });
+      } catch (error) {
+        console.error("err", error);
+      }
+    };
   
 
   const form = useForm({
@@ -35,7 +30,6 @@ function Form({id}:{id:any}) {
       title: "",
       description: "",
       employeeId: "",
-      projectId: "",
     },
 
     validate: {
@@ -45,7 +39,6 @@ function Form({id}:{id:any}) {
           ? null
           : "Description must be at least 10 characters",
       employeeId: (value) => (value ? null : "Please select an employee"),
-      projectId: (value) => (value ? null : "Please select a project"),
     },
   });
 
@@ -80,16 +73,7 @@ function Form({id}:{id:any}) {
           {...form.getInputProps("employeeId")}
         />
 
-        <Select
-          label="Select Project"
-          placeholder="Pick a project"
-          /*            loading={loadingProjects}
-           */ data={queryProjects?.getProjects.map((project: any) => ({
-            label: project.title,
-            value: project.id,
-          }))}
-          {...form.getInputProps("projectId")}
-        />
+       
 
         <Group justify="flex-end" mt="md">
           <Button type="submit">Submit</Button>
@@ -99,12 +83,12 @@ function Form({id}:{id:any}) {
   );
 }
 
-export default function CreateTask({params}) {
+export default function CreateTaskForProject({params}) {
   return (
     <div>
-      <h1>./Update Task {params.id}</h1>
+      <h1>./Create Task for project {params.id}</h1>
 
-      <Form id={params.id} />
+      <Form  id={params.id}  />
     </div>
   );
 }

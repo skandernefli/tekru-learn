@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-
+import { format, fromUnixTime } from "date-fns";
 import { Button } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import getTasks from "../queries/getTasks";
-import { useQuery,useMutation } from "@apollo/client";
-import deleteTask from '../mutations/deleteTask'
+import getProjectTasks from "../queries/getProjectTasks";
+import { useQuery, useMutation } from "@apollo/client";
+import deleteTask from "../mutations/deleteTask";
 import {
   Table,
   ScrollArea,
@@ -24,13 +24,12 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import classes from "../../app/table.module.css";
-interface RowData {
-  title: string;
-  id: string;
-  description: string;
-  projectId: string;
-  employeeId: string;
 
+interface RowData {
+id:string;
+  title: string;
+  description: string;
+  name: { name: string };
 }
 
 interface ThProps {
@@ -45,20 +44,32 @@ function DeleteButton({ onClick }: { onClick: () => Promise<void> }) {
     marginRight: "10px",
   };
   return (
-    <Button variant="filled" color="red" style={buttonStyle}  onClick={onClick}>
+    <Button
+      variant="filled"
+      color="red"
+      style={buttonStyle}
+      onClick={onClick}
+      size="xs"
+    >
       Delete
     </Button>
   );
 }
 function EditButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button variant="filled" color="yellow"   onClick={onClick}>
+    <Button variant="filled" color="yellow" onClick={onClick} size="xs">
       Edit
     </Button>
   );
 }
-
-function CreateButton() {
+function NavigateToProjectTasks({ onClick }: { onClick: () => void }) {
+  return (
+    <Button variant="filled" color="violet" onClick={onClick} size="xs">
+      Tasks
+    </Button>
+  );
+}
+function CreateButton({ onClick }: { onClick: () => void }) {
   const router = useRouter();
   const buttonStyle = {
     left: "61vw",
@@ -68,9 +79,7 @@ function CreateButton() {
       variant="filled"
       color="teal"
       style={buttonStyle}
-      onClick={() => {
-        router.push("/createtask");
-      }}
+      onClick={onClick}
     >
       Create
     </Button>
@@ -113,6 +122,7 @@ function filterData(data: RowData[], search: string) {
     })
   );
 }
+
 function sortData(
   data: RowData[],
   payload: { sortBy: keyof RowData | null; reversed: boolean; search: string }
@@ -135,22 +145,24 @@ function sortData(
   );
 }
 
-export default function EmployeeTable() {
+export default function ProjectTable({ id }) {
   const {
     loading,
     error,
     data: queryData,
-  } = useQuery(getTasks);
-
+  } = useQuery(getProjectTasks, { variables: { getProjectId: id } });
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
-
-  const [sortedData, setSortedData] = useState(queryData?.getTasks || []);
-
+  const [sortedData, setSortedData] = useState(
+    queryData?.getProject?.tasks || []
+  );
   useEffect(() => {
+    console.log(queryData?.getProject?.tasks);
+
+    const projectTasks = queryData?.getProject?.tasks || [];
     setSortedData(
-      sortData(queryData?.getTasks || [], {
+      sortData(projectTasks || [], {
         sortBy,
         reversed: reverseSortDirection,
         search,
@@ -168,25 +180,44 @@ export default function EmployeeTable() {
     const { value } = event.currentTarget;
     setSearch(value);
   };
-const router=useRouter();
-const [DeleteTask, { data, loading:deletionInProgress, error:deletionError }] = useMutation(deleteTask);
-  const handleDeletion = async (id:any) => {
+  const router = useRouter();
+  const [
+    DeleteProject,
+    { data, loading: deletionInProgress, error: deletionError },
+  ] = useMutation(deleteTask);
+  const handleDeletion = async (id: any) => {
     try {
-      await DeleteTask({ variables: { deleteTaskId: id } });
+      await DeleteProject({ variables: { deleteTaskId: id } });
     } catch (error) {
       console.error("err", error);
     }
   };
-  const rows = sortedData.map((row:any) => (
+  const rows = sortedData.map((row: any) => (
     <Table.Tr key={row.id}>
-      <Table.Td onClick={() => router.push(`/tasks/${row.id}`)}  style={{ cursor: 'pointer' }}>{row.title}</Table.Td>
-      <Table.Td onClick={() => router.push(`/tasks/${row.id}`)}  style={{ cursor: 'pointer' }}>{row.description}</Table.Td>
-      <Table.Td onClick={() => router.push(`/tasks/${row.id}`)}  style={{ cursor: 'pointer' }}> {row.projectId}</Table.Td>
-      <Table.Td onClick={() => router.push(`/tasks/${row.id}`)}  style={{ cursor: 'pointer' }}> {row.employeeId}</Table.Td>
+      <Table.Td
+        onClick={() => router.push(`/projects/${row.id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        {row.title}
+      </Table.Td>
+      <Table.Td
+        onClick={() => router.push(`/projects/${row.id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        {row.description}
+      </Table.Td>
+      <Table.Td
+        onClick={() => router.push(`/projects/${row.id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        {row.employee.name}
+      </Table.Td>
 
       <Table.Td>
-        <DeleteButton   onClick={()=>handleDeletion(row.id) } />
-        <EditButton   onClick={() => router.push(`/tasks/update/${row.id}`)} />
+
+
+        <DeleteButton onClick={() => handleDeletion(row.id)} />
+        <EditButton onClick={() => router.push(`/tasks/update/${row.id}`)}/>
       </Table.Td>
     </Table.Tr>
   ));
@@ -205,7 +236,12 @@ const [DeleteTask, { data, loading:deletionInProgress, error:deletionError }] = 
         value={search}
         onChange={handleSearchChange}
       />
-      <CreateButton />
+      <h2>Title: <span className="text-gray-600">{ queryData?.getProject?.title}</span></h2>
+      <h2>Description: <span className="text-gray-600">{ queryData?.getProject?.description}</span></h2>
+      <h2>Start Date: <span className="text-gray-600">{queryData ? format(fromUnixTime(queryData?.getProject?.startDate / 1000), "yyyy-MM-dd") : null}</span></h2>
+      <h2>End Date: <span className="text-gray-600">{queryData ? format(fromUnixTime(queryData?.getProject?.endDate / 1000), "yyyy-MM-dd") : null}</span></h2>
+
+      <CreateButton  onClick={() => router.push(`/create_task_for/${id}`)}/>
       {loading ? (
         <div>loading</div>
       ) : error ? (
@@ -234,18 +270,11 @@ const [DeleteTask, { data, loading:deletionInProgress, error:deletionError }] = 
                 description
               </Th>
               <Th
-                sorted={sortBy === "projectId"}
+                sorted={sortBy === "name"}
                 reversed={reverseSortDirection}
-                onSort={() => setSorting("projectId")}
+                onSort={() => setSorting("name")}
               >
-                projectId
-              </Th>
-              <Th
-                sorted={sortBy === "employeeId"}
-                reversed={reverseSortDirection}
-                onSort={() => setSorting("employeeId")}
-              >
-                employeeId
+                Employee Name
               </Th>
             </Table.Tr>
           </Table.Tbody>
@@ -267,4 +296,3 @@ const [DeleteTask, { data, loading:deletionInProgress, error:deletionError }] = 
     </ScrollArea>
   );
 }
-

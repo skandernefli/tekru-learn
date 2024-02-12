@@ -1,5 +1,5 @@
 import Task from "../models/Task";
-
+import Employee from "../models/Employee"
 const TaskResolver = {
   Query: {
     getTask: async (_: any, { id }: { id: any }) => {
@@ -37,7 +37,7 @@ const TaskResolver = {
         description,
         projectId,
         employeeId,
-      }: {id:any; title: string; description: string; projectId: number; employeeId: number }
+      }: {id:any; title: string; description: string; projectId: string; employeeId: string }
     ) => {
       const theTask = await Task.findByPk(id);
       if (theTask) {
@@ -68,6 +68,11 @@ const TaskResolver = {
       }
       return false;
     },
-  },
+   },
+   task: {
+    employee: async (task: any) => {
+      return await Employee.findByPk(task.employeeId)
+    },
+  }
 };
 export default TaskResolver;

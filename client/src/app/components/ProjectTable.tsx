@@ -45,15 +45,22 @@ function DeleteButton({ onClick }: { onClick: () => Promise<void> }) {
     marginRight: "10px",
   };
   return (
-    <Button variant="filled" color="red" style={buttonStyle}  onClick={onClick}>
+    <Button variant="filled" color="red" style={buttonStyle}  onClick={onClick} size="xs">
       Delete
     </Button>
   );
 }
 function EditButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button variant="filled" color="yellow"   onClick={onClick}>
+    <Button variant="filled" color="yellow"   onClick={onClick} size="xs">
       Edit
+    </Button>
+  );
+}
+function NavigateToProjectTasks({ onClick }: { onClick: () => void }) {
+  return (
+    <Button variant="filled" color="violet"   onClick={onClick} size="xs">
+      Tasks
     </Button>
   );
 }
@@ -187,6 +194,9 @@ const handleDeletion = async (id:any) => {
 
 
       <Table.Td>
+      
+        <NavigateToProjectTasks onClick={() => router.push(`/projects/${row.id}`)}/>
+
         <DeleteButton onClick={()=>handleDeletion(row.id) }/>
         <EditButton  onClick={() => router.push(`/projects/update/${row.id}`)}/>
       </Table.Td>

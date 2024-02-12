@@ -22,7 +22,6 @@ function Form({id}:{id:any}) {
 
   const handleSubmit = async (values:any) => {
     try {
-        
       await UpdateEmployee({ variables:  { updateEmployeeId:id, ...values} });
     } catch (error) {
       console.error("err", error);

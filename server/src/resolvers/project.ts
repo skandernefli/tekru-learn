@@ -1,5 +1,5 @@
 import Project from "../models/Project";
-
+import Task from "../models/Task";
 const ProjectResolver = {
   Query: {
     getProject: async (_: any, { id }: { id: any }) => {
@@ -82,6 +82,16 @@ const ProjectResolver = {
       }
       return false;
     },
-  },
+    
+  },project: {
+    tasks: async (
+      parent: any, 
+    ) => {
+      return await Task.findAll({
+        where: {
+          projectId: parent.id, 
+        },
+      });
+    },}
 };
 export default ProjectResolver;

@@ -16,6 +16,7 @@ const typeDefs = gql`
     endDate: String!
     description: String
     taskId: Int
+    tasks: [task]  
   }
   type task {
     id: ID!
@@ -23,6 +24,8 @@ const typeDefs = gql`
     description: String!
     projectId: String!
     employeeId: String!
+    employee:employee
+    project:project
   }
   type Query {
     getEmployee(id: ID!): employee
@@ -62,9 +65,9 @@ const typeDefs = gql`
     updateTask(
       id: ID!
       title: String
-      description: String!
-      projectId: Int
-      employeeId: Int
+      description: String
+      projectId: String
+      employeeId: String
     ): task
 
     deleteTask(id: ID!): Boolean
@@ -80,11 +83,11 @@ const typeDefs = gql`
 
     updateProject(
       id: ID!
-      title: String!
-      startDate: String!
-      endDate: String!
+      title: String
+      startDate: String
+      endDate: String
       description: String
-      taskId: Int!
+      taskId: Int
     ): project
 
     deleteProject(id: ID!): Boolean
